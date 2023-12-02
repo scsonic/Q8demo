@@ -31,6 +31,8 @@
         H: "viseme_TH",
         X: "viseme_PP",
       };
+      let lipChars= "ABCDEFGHX_"
+
       var gModel = undefined ;
       
       var showSkl = function(){
@@ -55,43 +57,80 @@
         gModel.Wolf3D_Head = target3D[3];
         gModel.Wolf3D_Teeth = target3D[4];
 
-        setTimeout(move, 1000);
-        setTimeout(move, 2000);
-        setTimeout(move, 3000);
-        setTimeout(move, 4000);
-        setTimeout(move, 5000);
+        
+        for (var i = 0; i < lipChars.length; i++) {
+          console.log(lipChars[i]);
+          setTimeout(move , 500*(i+1), lipChars[i]);
+        }
       };
 
-      var move = function(){
-        console.log("run move");
+      var move = function(ch){
+        console.log("run move:", ch);
+
+        // 1: normal
+        // 0.5: 動作小一點 不會大嘴巴，比較好看
+
+        var morphTargetSmoothing = 0.5;
         Object.values(corresponding).forEach((value) => {
             gModel.Wolf3D_Head.morphTargetInfluences[
-              gModel.Wolf3D_Head.morphTargetDictionary[value]
-            ] = 0;
+            gModel.Wolf3D_Head.morphTargetDictionary[value]
+            ] = THREE.MathUtils.lerp(
+              gModel.Wolf3D_Head.morphTargetInfluences[
+                gModel.Wolf3D_Head.morphTargetDictionary[value]
+              ],
+              0,
+              morphTargetSmoothing
+            );
+
             gModel.Wolf3D_Teeth.morphTargetInfluences[
               gModel.Wolf3D_Teeth.morphTargetDictionary[value]
-            ] = 0;
+            ] = THREE.MathUtils.lerp(
+              gModel.Wolf3D_Teeth.morphTargetInfluences[
+                gModel.Wolf3D_Teeth.morphTargetDictionary[value]
+              ],
+              0,
+              morphTargetSmoothing
+            );
         });
 
-        var aeiou = getRandomCharacter()
-
+        //var aeiou = getRandomCharacter()
+        if (corresponding[ch] != undefined){
           gModel.Wolf3D_Head.morphTargetInfluences[
             gModel.Wolf3D_Head.morphTargetDictionary[
-              corresponding[aeiou]
+              corresponding[ch]
             ]
-          ] = 1;
+          ] = THREE.MathUtils.lerp(
+            gModel.Wolf3D_Head.morphTargetInfluences[
+              gModel.Wolf3D_Head.morphTargetDictionary[
+                corresponding[ch]
+              ]
+            ],
+            1,
+            morphTargetSmoothing
+          );
           gModel.Wolf3D_Teeth.morphTargetInfluences[
             gModel.Wolf3D_Teeth.morphTargetDictionary[
-              corresponding[aeiou]
+              corresponding[ch]
             ]
-          ] = 1;
+          ] = THREE.MathUtils.lerp(
+            gModel.Wolf3D_Teeth.morphTargetInfluences[
+              gModel.Wolf3D_Teeth.morphTargetDictionary[
+                corresponding[ch]
+              ]
+            ],
+            1,
+            morphTargetSmoothing
+          );
+        }
+
+
       }
 
       $(function(){
           console.log("init") ;
           setTimeout(function(){
             showSkl() ;  // wait for the model load ready!
-          },500);
+          },1000);
           
       });
 

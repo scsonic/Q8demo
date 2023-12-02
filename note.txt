@@ -1,0 +1,4 @@
+https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API
+https://r3f-lipsync-tutorial.vercel.app/
+https://github.com/wass08/r3f-lipsync-tutorial/blob/main/src/components/Avatar.jsx
+https://github.com/met4citizen/TalkingHead
