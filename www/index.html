@@ -1,0 +1,120 @@
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@9b8609bd84a292ef97bf1e8589401ae0d3201280/dist/aframe-master.min.js"></script>
+
+    <script src="js/jquery-1.11.1.min.js"></script>
+
+
+    <script>
+      function getRandomCharacter() {
+        // 字元A到H的範圍碼
+        var minCharCode = 'A'.charCodeAt(0);
+        var maxCharCode = 'H'.charCodeAt(0);
+
+        // 取得隨機的範圍內的字元碼
+        var randomCharCode = Math.floor(Math.random() * (maxCharCode - minCharCode + 1)) + minCharCode;
+
+        // 將字元碼轉換為對應的字元
+        var randomCharacter = String.fromCharCode(randomCharCode);
+
+        return randomCharacter;
+      }
+
+      const corresponding = {
+        A: "viseme_PP",
+        B: "viseme_kk",
+        C: "viseme_I",
+        D: "viseme_AA",
+        E: "viseme_O",
+        F: "viseme_U",
+        G: "viseme_FF",
+        H: "viseme_TH",
+        X: "viseme_PP",
+      };
+      var gModel = undefined ;
+      
+      var showSkl = function(){
+
+        var model = $("#my_model")[0] ;
+        gModel = model ;
+        console.log(model);
+
+        const required = ['Armature',"EyeLeft", "EyeRight",'Wolf3D_Head','Wolf3D_Teeth'];
+        var target3D = [] ;
+
+        required.forEach((r) => {
+          console.log("r=" + r)
+          var obj = gModel.object3D.getObjectByName("Wolf3D_Head");
+          console.log(obj);
+          target3D.push(obj);
+        });
+
+        gModel.Armature = target3D[0];
+        gModel.EyeLeft = target3D[1];
+        gModel.EyeRight = target3D[2];
+        gModel.Wolf3D_Head = target3D[3];
+        gModel.Wolf3D_Teeth = target3D[4];
+
+        setTimeout(move, 1000);
+        setTimeout(move, 2000);
+        setTimeout(move, 3000);
+        setTimeout(move, 4000);
+        setTimeout(move, 5000);
+      };
+
+      var move = function(){
+        console.log("run move");
+        Object.values(corresponding).forEach((value) => {
+            gModel.Wolf3D_Head.morphTargetInfluences[
+              gModel.Wolf3D_Head.morphTargetDictionary[value]
+            ] = 0;
+            gModel.Wolf3D_Teeth.morphTargetInfluences[
+              gModel.Wolf3D_Teeth.morphTargetDictionary[value]
+            ] = 0;
+        });
+
+        var aeiou = getRandomCharacter()
+
+          gModel.Wolf3D_Head.morphTargetInfluences[
+            gModel.Wolf3D_Head.morphTargetDictionary[
+              corresponding[aeiou]
+            ]
+          ] = 1;
+          gModel.Wolf3D_Teeth.morphTargetInfluences[
+            gModel.Wolf3D_Teeth.morphTargetDictionary[
+              corresponding[aeiou]
+            ]
+          ] = 1;
+      }
+
+      $(function(){
+          console.log("init") ;
+          setTimeout(function(){
+            showSkl() ;  // wait for the model load ready!
+          },500);
+          
+      });
+
+
+
+    </script>
+  </head>
+  <body>
+    <a-scene>
+        <a-assets>
+        <a-asset-item id="james" src="./model/james.glb"></a-asset-item>
+      </a-assets>
+
+
+      <a-sky id="mysky" src="img/sky1.jpg"></a-sky>
+
+      <!--
+      <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
+      <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
+      <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
+    -->
+      <a-entity id="my_model" gltf-model="#james" position="0 0 -0.5"></a-entity>
+
+    </a-scene>
+  </body>
+</html>
