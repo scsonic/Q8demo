@@ -1,8 +1,8 @@
 <html>
   <head>
-    <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@9b8609bd84a292ef97bf1e8589401ae0d3201280/dist/aframe-master.min.js"></script>
-
+    <script src="js/aframe-master.min.js"></script>
     <script src="js/jquery-1.11.1.min.js"></script>
+    <script src="js/func.js"></script>
 
     <style>
 
@@ -20,44 +20,20 @@
 
     </style>
     <script>
-      function getRandomCharacter() {
-        // 字元A到H的範圍碼
-        var minCharCode = 'A'.charCodeAt(0);
-        var maxCharCode = 'H'.charCodeAt(0);
-        var randomCharCode = Math.floor(Math.random() * (maxCharCode - minCharCode + 1)) + minCharCode;
-        var randomCharacter = String.fromCharCode(randomCharCode);
-
-        return randomCharacter;
-      }
-
-      const corresponding = {
-        A: "viseme_PP",
-        B: "viseme_kk",
-        C: "viseme_I",
-        D: "viseme_AA",
-        E: "viseme_O",
-        F: "viseme_U",
-        G: "viseme_FF",
-        H: "viseme_TH",
-        X: "viseme_PP",
-      };
-      let lipChars= "ABCDEFGHX_"
 
       var gModel = undefined ;
       
       var showSkl = function(){
-
         var model = $("#my_model")[0] ;
         gModel = model ;
-        console.log(model);
 
         const required = ['Armature',"EyeLeft", "EyeRight",'Wolf3D_Head','Wolf3D_Teeth'];
         var target3D = [] ;
 
         required.forEach((r) => {
-          console.log("r=" + r)
+          // console.log("r=" + r)
           var obj = gModel.object3D.getObjectByName("Wolf3D_Head");
-          console.log(obj);
+          // console.log(obj);
           target3D.push(obj);
         });
 
@@ -66,104 +42,16 @@
         gModel.EyeRight = target3D[2];
         gModel.Wolf3D_Head = target3D[3];
         gModel.Wolf3D_Teeth = target3D[4];
-
         
-        for (var i = 0; i < lipChars.length; i++) {
-          console.log(lipChars[i]);
-          setTimeout(move , 500*(i+1), lipChars[i]);
-        }
+        // for (var i = 0; i < lipChars.length; i++) {
+        //   console.log(lipChars[i]);
+        //   setTimeout(move , 500*(i+1), lipChars[i]);
+        // }
       };
 
-      var move = function(ch){
-        console.log("run move:", ch);
-
-        // 1: normal
-        // 0.5: 動作小一點 不會大嘴巴，比較好看
-
-        var morphTargetSmoothing = 0.5;
-        Object.values(corresponding).forEach((value) => {
-            gModel.Wolf3D_Head.morphTargetInfluences[
-            gModel.Wolf3D_Head.morphTargetDictionary[value]
-            ] = THREE.MathUtils.lerp(
-              gModel.Wolf3D_Head.morphTargetInfluences[
-                gModel.Wolf3D_Head.morphTargetDictionary[value]
-              ],
-              0,
-              morphTargetSmoothing
-            );
-
-            gModel.Wolf3D_Teeth.morphTargetInfluences[
-              gModel.Wolf3D_Teeth.morphTargetDictionary[value]
-            ] = THREE.MathUtils.lerp(
-              gModel.Wolf3D_Teeth.morphTargetInfluences[
-                gModel.Wolf3D_Teeth.morphTargetDictionary[value]
-              ],
-              0,
-              morphTargetSmoothing
-            );
-        });
-
-        //var aeiou = getRandomCharacter()
-        if (corresponding[ch] != undefined){
-          gModel.Wolf3D_Head.morphTargetInfluences[
-            gModel.Wolf3D_Head.morphTargetDictionary[
-              corresponding[ch]
-            ]
-          ] = THREE.MathUtils.lerp(
-            gModel.Wolf3D_Head.morphTargetInfluences[
-              gModel.Wolf3D_Head.morphTargetDictionary[
-                corresponding[ch]
-              ]
-            ],
-            1,
-            morphTargetSmoothing
-          );
-          gModel.Wolf3D_Teeth.morphTargetInfluences[
-            gModel.Wolf3D_Teeth.morphTargetDictionary[
-              corresponding[ch]
-            ]
-          ] = THREE.MathUtils.lerp(
-            gModel.Wolf3D_Teeth.morphTargetInfluences[
-              gModel.Wolf3D_Teeth.morphTargetDictionary[
-                corresponding[ch]
-              ]
-            ],
-            1,
-            morphTargetSmoothing
-          );
-        }
-      }
-
-      var loopSpeaking = function(){
-          var ch = getRandomCharacter();
-          move(ch);
-          if (speaking){
-            setTimeout(loopSpeaking , 100, ch);  
-          }
-          else {
-            move("_") ;
-          }
-      }
-
-      var speak = function(line){
-          var msg = new SpeechSynthesisUtterance(line);
-          console.log(msg);
-          msg.onend = function(){
-            console.log("on speak end");
-            speaking = false;
-          }
-          msg.onstart = function(){
-            console.log("on start end");
-            speaking = true;
-            loopSpeaking() ;
-          }
-          window.speechSynthesis.speak(msg);
-      }
 
       var bindAll = function(){
-
         $("#btnSpeak").click(function(v){
-
           var line = $("#inputText").val() ;
           console.log(line) ;
           speak(line);
@@ -182,7 +70,7 @@
     </script>
   </head>
   <body>
-    <a-scene embedded>
+    <a-scene>
         <a-assets>
         <a-asset-item id="james" src="./model/james.glb"></a-asset-item>
       </a-assets>
