@@ -23,9 +23,11 @@
 
       var gModel = undefined ;
       
-      var showSkl = function(){
+      var bindModel = function(){
+        console.log("bind model");
         var model = $("#my_model")[0] ;
         gModel = model ;
+        console.log(gModel);
 
         const required = ['Armature',"EyeLeft", "EyeRight",'Wolf3D_Head','Wolf3D_Teeth'];
         var target3D = [] ;
@@ -47,6 +49,7 @@
         //   console.log(lipChars[i]);
         //   setTimeout(move , 500*(i+1), lipChars[i]);
         // }
+
       };
 
 
@@ -56,28 +59,50 @@
           console.log(line) ;
           speak(line);
         });
+
+        $("#selBackground").change(function(){
+          var val = $("#selBackground").val();
+          $("#backImg").attr("src", val);
+
+        });
       };
 
 
       $(function(){
           console.log("init") ;
-          setTimeout(function(){
-            showSkl() ;  // wait for the model load ready!
-          },1000);
+          // setTimeout(function(){
+          //   showSkl() ;  // wait for the model load ready!
+          // },1000);
           bindAll()
+
+        document.querySelector('#james').addEventListener('loaded', function() {
+           console.log('loaded');
+          setTimeout(function(){
+              bindModel();
+            }, 2000);
+           
+        });
+
+
+
       });
+
+
+
 
     </script>
   </head>
   <body>
     <a-scene>
-        <a-assets>
+      <a-assets>
         <a-asset-item id="james" src="./model/james.glb"></a-asset-item>
       </a-assets>
 
 
-      <a-sky id="mysky" src="img/sky1.jpg"></a-sky>
-      <a-entity id="my_model" gltf-model="#james" position="0 0 -0.5"></a-entity>
+      <a-sky id="mysky" color="#333333"></a-sky>
+
+      <a-image id="backImg" src="img/back1.jpg" width=3 height=3   position="0 1.7 -1.2"></a-image>
+      <a-entity id="my_model" gltf-model="#james" position="0 0.1 -0.5"></a-entity>
 
 
     </a-scene>
@@ -87,11 +112,21 @@
       <input type=submit value="Send" id="btnSpeak" />
 
       <button id="speechButton">Hold to Talk</button>
+      <select id="selBackground">
+        <option value="img/back1.jpg">Home Depot</option>
+        <option value="img/back2.jpg">Wall Mart</option>
+        <option value="img/back3.jpg">Home Depot-2</option>
+      </select>
+
+      <select id="selModel">
+        <option value="model/james.glb">James</option>
+      </select>
 
     </div>
 
-
     <script>
+
+
 
     const speechButton = document.getElementById('speechButton');
     const inputText = document.getElementById('inputText');

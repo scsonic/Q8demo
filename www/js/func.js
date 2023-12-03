@@ -25,7 +25,7 @@ function getRandomCharacter() {
 
 
 var move = function(ch){
-	console.log("run move:", ch);
+	// console.log("run move:", ch);
 
 	var model = $("#my_model")[0] ;
 	gModel = model ;
@@ -112,4 +112,3 @@ var loopSpeaking = function(){
       }
       window.speechSynthesis.speak(msg);
   }
-      
