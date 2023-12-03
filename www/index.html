@@ -65,6 +65,15 @@
           $("#backImg").attr("src", val);
 
         });
+
+        $("#selModel").change(function(){
+          var val = $("#selModel").val();
+          console.log("change to" + val);
+          $("#my_model").attr("gltf-model", val);
+          setTimeout(function(){
+            bindModel();
+          }, 1000);
+        });
       };
 
 
@@ -96,13 +105,14 @@
     <a-scene>
       <a-assets>
         <a-asset-item id="james" src="./model/james.glb"></a-asset-item>
+        <a-asset-item id="engineer" src="./model/engineer.glb"></a-asset-item>
       </a-assets>
 
 
       <a-sky id="mysky" color="#333333"></a-sky>
 
       <a-image id="backImg" src="img/back1.jpg" width=3 height=3   position="0 1.7 -1.2"></a-image>
-      <a-entity id="my_model" gltf-model="#james" position="0 0.1 -0.5"></a-entity>
+      <a-entity id="my_model" gltf-model="./model/james.glb" position="0 0.1 -0.5"></a-entity>
 
 
     </a-scene>
@@ -119,7 +129,8 @@
       </select>
 
       <select id="selModel">
-        <option value="model/james.glb">James</option>
+        <option value="./model/james.glb">Model1</option>
+        <option value="./model/engineer.glb">Engineer</option>
       </select>
 
     </div>
