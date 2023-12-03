@@ -164,12 +164,10 @@
           bindAll()
       });
 
-
-
     </script>
   </head>
   <body>
-    <a-scene width=640 height=480>
+    <a-scene embedded>
         <a-assets>
         <a-asset-item id="james" src="./model/james.glb"></a-asset-item>
       </a-assets>
@@ -186,10 +184,52 @@
 
     </a-scene>
 
-    <div class="buttom" style="z-index:1001;">
+    <div class="buttom" style="z-index:1001; position: absolute; height: 100px; width: 100%; bottom: :0 ; background: #CCCCCCCC">
       <input type=text />
       <input type=submit value="Send" id="btnSpeak" />
+
+      <button id="speechButton">Hold to Talk</button>
+      <textarea id="output" placeholder="audio input result"></textarea>
+
     </div>
+
+
+    <script>
+
+    const speechButton = document.getElementById('speechButton');
+      const outputTextarea = document.getElementById('output');
+      let recognition;
+
+      speechButton.addEventListener('mousedown', startRecognition);
+      speechButton.addEventListener('mouseup', stopRecognition);
+      speechButton.addEventListener('mouseleave', stopRecognition);
+
+      function startRecognition() {
+        console.log("start rec");
+        recognition = new window.webkitSpeechRecognition();
+        recognition.lang = 'zh-TW'; // 設置語音識別語言，此處為繁體中文
+        recognition.interimResults = true; // 允許即時更新識別結果
+
+        recognition.onresult = function (event) {
+          const transcript = event.results[0][0].transcript;
+          outputTextarea.value = transcript;
+        };
+
+        recognition.onend = function () {
+          console.log("onend rec");
+          recognition.stop();
+        };
+
+        recognition.start();
+      }
+
+      function stopRecognition() {
+        console.log("stop rec");
+        if (recognition) {
+          recognition.stop();
+        }
+      }
+    </script>
 
   </body>
 </html>
