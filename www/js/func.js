@@ -142,7 +142,7 @@ var post_chat = function(new_message){
             for (var i = 0 ; i < data.choices.length ; i++){
                 msg += data.choices[i].message.content;
             }
-            talk(msg) ;
+            talk(msg, true) ;
             // console.log(data) ;
             $("#loading").addClass("hidden") ;
         },
