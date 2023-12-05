@@ -5,3 +5,6 @@ https://github.com/met4citizen/TalkingHead
 
 
 https://readyplayer.me/gallery/656c87f1e552009499785d19
+
+
+https://models.readyplayer.me/656cced9e5520094997931b4.glb

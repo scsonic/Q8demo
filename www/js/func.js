@@ -112,3 +112,48 @@ var loopSpeaking = function(){
       }
       window.speechSynthesis.speak(msg);
   }
+
+
+var talk = function(message, isSpeak){
+    if (isSpeak){
+        speak(message);
+    }
+    $("#talk").html(message);
+}
+
+var post_chat = function(new_message){
+
+    var dic = {}
+    var message = [] ;
+    var prompt = {"role": "user", "content": "Your name is Mr.Helper"};
+    message.push(prompt);
+    var user = {"role": "user", "content": new_message};
+    message.push(user);
+    dic.messages = message ;
+
+    console.log("post sended") ;
+
+    $.ajax({
+        contentType: 'application/json',
+        data: JSON.stringify(dic),
+        dataType: 'json',
+        success: function(data){
+            var msg = ""
+            for (var i = 0 ; i < data.choices.length ; i++){
+                msg += data.choices[i].message.content;
+            }
+            talk(msg) ;
+            // console.log(data) ;
+            $("#loading").addClass("hidden") ;
+        },
+        error: function(){
+            console.log("data")
+            console.log("Device control failed");
+            $("#loading").addClass("hidden") ;
+        },
+        processData: false,
+        type: 'POST',
+        url: 'http://127.0.0.1:8080/v1/chat/completions'
+    });
+
+}
