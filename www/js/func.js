@@ -114,14 +114,20 @@ var loopSpeaking = function(){
   }
 
 
-var talk = function(message, isSpeak){
+var talk = function(message, isSpeak, isAppend){
     if (isSpeak){
         speak(message);
     }
-    $("#talk").html(message);
+    if (isAppend){
+        $("#talk").html( $("#talk").html() + message);
+    }
+    else{
+        $("#talk").html(message);
+    }
+
 }
 
-var post_chat = function(new_message){
+var post_chat_old = function(new_message){
 
     var dic = {}
     var message = [] ;
@@ -155,5 +161,62 @@ var post_chat = function(new_message){
         type: 'POST',
         url: 'http://127.0.0.1:8080/v1/chat/completions'
     });
+}
+
+
+
+var post_chat_stream = async function(new_message){
+    console.log("using post chat v2, stream");
+
+    var dic = {}
+    var message = [] ;
+    var prompt = {"role": "user", "content": "Your name is Mr.Helper"};
+    message.push(prompt);
+    var user = {"role": "user", "content": new_message};
+    message.push(user);
+    dic.messages = message ;
+
+    dic["stream"] = true;
+
+    console.log(JSON.stringify(dic));
+    const response = await fetch('http://127.0.0.1:8080/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dic),
+    });
+
+    $("#talk").html("");
+    const reader = response.body?.pipeThrough(new TextDecoderStream()).getReader();
+    if (!reader) return;
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      // eslint-disable-next-line no-await-in-loop
+      const { value, done } = await reader.read();
+      if (done) break;
+      let dataDone = false;
+      const arr = value.split('\n');
+      arr.forEach((data) => {
+        if (data.length === 0) return; // ignore empty message
+        if (data.startsWith(':')) return; // ignore sse comment message
+        if (data === 'data: [DONE]') {
+          dataDone = true;
+          return;
+        }
+        const json = JSON.parse(data.substring(6));
+        console.log(json);
+        var msg = json.choices[0].delta.content;
+        console.log(msg);
+        if (msg != undefined){
+            talk(msg, true, true);
+        }
+
+      });
+      if (dataDone) break;
+    }
 
 }
+console.log("has post_chat_stream?");
+console.log(post_chat_stream)
+
