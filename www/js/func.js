@@ -87,11 +87,16 @@ var move = function(ch){
 	}
 }
 
+
+var timeout_id = undefined ;
 var loopSpeaking = function(){
       var ch = getRandomCharacter();
       move(ch);
       if (speaking){
-        setTimeout(loopSpeaking , 100, ch);  
+        if (timeout_id != undefined){
+            clearTimeout(timeout_id);
+        }
+        timeout_id = setTimeout(loopSpeaking , 100, ch);// can only have one here
       }
       else {
         move("_") ;
@@ -100,13 +105,13 @@ var loopSpeaking = function(){
 
   var speak = function(line){
       var msg = new SpeechSynthesisUtterance(line);
-      console.log(msg);
+      console.log("speak:" + line);
       msg.onend = function(){
-        console.log("on speak end");
+        //console.log("on speak end");
         speaking = false;
       }
       msg.onstart = function(){
-        console.log("on start end");
+        //console.log("on start end");
         speaking = true;
         loopSpeaking() ;
       }
@@ -165,6 +170,8 @@ var post_chat_old = function(new_message){
 
 
 
+var chat_response_stream = "" ;
+
 var post_chat_stream = async function(new_message){
     console.log("using post chat v2, stream");
 
@@ -188,6 +195,8 @@ var post_chat_stream = async function(new_message){
     });
 
     $("#talk").html("");
+    chat_response_stream = "" ;
+
     const reader = response.body?.pipeThrough(new TextDecoderStream()).getReader();
     if (!reader) return;
     // eslint-disable-next-line no-constant-condition
@@ -207,16 +216,25 @@ var post_chat_stream = async function(new_message){
         const json = JSON.parse(data.substring(6));
         console.log(json);
         var msg = json.choices[0].delta.content;
-        console.log(msg);
+
         if (msg != undefined){
-            talk(msg, true, true);
+            console.log("chuck:" + msg);
+            chat_response_stream += msg ;
+            var containsCommaOrDot = /[,.]/.test(chat_response_stream);
+            if (containsCommaOrDot){
+                var temp = chat_response_stream ;
+                chat_response_stream = "" ;
+                speak(temp);
+            }
+            talk(msg, false, true);
         }
 
       });
-      if (dataDone) break;
+      if (dataDone) {
+        break;
+      }
     }
-
+    console.log("while exit! flush the rest:" + chat_response_stream);
+    speak(chat_response_stream);
 }
-console.log("has post_chat_stream?");
-console.log(post_chat_stream)
 
