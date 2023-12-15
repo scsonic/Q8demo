@@ -177,7 +177,7 @@ var post_chat_stream = async function(new_message){
 
     var dic = {}
     var message = [] ;
-    var prompt = {"role": "user", "content": "Your name is Mr.Helper"};
+    var prompt = {"role": "user", "content": ""};
     message.push(prompt);
     var user = {"role": "user", "content": new_message};
     message.push(user);
