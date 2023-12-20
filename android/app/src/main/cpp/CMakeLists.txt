@@ -1,48 +1,83 @@
-# For more information about using CMake with Android Studio, read the
-# documentation: https://d.android.com/studio/projects/add-native-code.html
+#cmake_minimum_required(VERSION 3.22.1)
+#project("q8demo")
+#add_library( # Sets the name of the library.
+#        q8demo
+#        # Sets the library as a shared library.
+#        SHARED
+#        # Provides a relative path to your source file(s).
+#        native-lib.cpp)
+#
+#find_library(
+#        log-lib
+#        log)
+#
+#target_link_libraries( # Specifies the target library.
+#        q8demo
+#
+#        # Links the target library to the log library
+#        # included in the NDK.
+#        ${log-lib})
 
-# Sets the minimum version of CMake required to build the native library.
+cmake_minimum_required(VERSION 3.10)
 
-cmake_minimum_required(VERSION 3.22.1)
+project(rnllama)
 
-# Declares and names the project.
+set(CMAKE_CXX_STANDARD 11)
+set(RNLLAMA_LIB_DIR ${CMAKE_SOURCE_DIR}/../../../../cpp)
 
-project("q8demo")
+include_directories(${RNLLAMA_LIB_DIR})
 
-# Creates and names a library, sets it as either STATIC
-# or SHARED, and provides the relative paths to its source code.
-# You can define multiple libraries, and CMake builds them for you.
-# Gradle automatically packages shared libraries with your APK.
+set(
+        SOURCE_FILES
+        ${RNLLAMA_LIB_DIR}/ggml-alloc.c
+        ${RNLLAMA_LIB_DIR}/ggml-backend.c
+        ${RNLLAMA_LIB_DIR}/ggml.c
+        ${RNLLAMA_LIB_DIR}/ggml-quants.c
+        ${RNLLAMA_LIB_DIR}/common.cpp
+        ${RNLLAMA_LIB_DIR}/grammar-parser.cpp
+        ${RNLLAMA_LIB_DIR}/sampling.cpp
+        ${RNLLAMA_LIB_DIR}/llama.cpp
+        ${RNLLAMA_LIB_DIR}/rn-llama.hpp
+        ${CMAKE_SOURCE_DIR}/jni.cpp
+)
 
-add_library( # Sets the name of the library.
-        q8demo
+find_library(LOG_LIB log)
 
-        # Sets the library as a shared library.
-        SHARED
+function(build_library target_name)
+    add_library(
+            ${target_name}
+            SHARED
+            ${SOURCE_FILES}
+    )
 
-        # Provides a relative path to your source file(s).
-        native-lib.cpp)
+    target_link_libraries(${target_name} ${LOG_LIB} android)
 
-# Searches for a specified prebuilt library and stores the path as a
-# variable. Because CMake includes system libraries in the search path by
-# default, you only need to specify the name of the public NDK library
-# you want to add. CMake verifies that the library exists before
-# completing its build.
+    target_compile_options(${target_name} PRIVATE -pthread)
 
-find_library( # Sets the name of the path variable.
-        log-lib
+    if (${target_name} STREQUAL "rnllama_v8fp16_va")
+        target_compile_options(${target_name} PRIVATE -march=armv8.4-a+fp16+dotprod)
+    endif ()
 
-        # Specifies the name of the NDK library that
-        # you want CMake to locate.
-        log)
+    if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+        target_compile_options(${target_name} PRIVATE -DRNLLAMA_ANDROID_ENABLE_LOGGING)
+    endif ()
 
-# Specifies libraries CMake should link to your target library. You
-# can link multiple libraries, such as libraries you define in this
-# build script, prebuilt third-party libraries, or system libraries.
+    # NOTE: If you want to debug the native code, you can uncomment if and endif
+    # if (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 
-target_link_libraries( # Specifies the target library.
-        q8demo
+    target_compile_options(${target_name} PRIVATE -O3 -DNDEBUG)
+    target_compile_options(${target_name} PRIVATE -fvisibility=hidden -fvisibility-inlines-hidden)
+    target_compile_options(${target_name} PRIVATE -ffunction-sections -fdata-sections)
 
-        # Links the target library to the log library
-        # included in the NDK.
-        ${log-lib})
+    target_link_options(${target_name} PRIVATE -Wl,--gc-sections)
+    target_link_options(${target_name} PRIVATE -Wl,--exclude-libs,ALL)
+    target_link_options(${target_name} PRIVATE -flto)
+
+    # endif ()
+endfunction()
+
+build_library(rnllama) # Default target
+
+if (${ANDROID_ABI} STREQUAL "arm64-v8a")
+    build_library("rnllama_v8fp16_va")
+endif ()

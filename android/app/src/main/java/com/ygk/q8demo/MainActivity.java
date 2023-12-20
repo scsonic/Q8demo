@@ -10,9 +10,9 @@ import com.ygk.q8demo.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
 
     // Used to load the 'q8demo' library on application startup.
-    static {
-        System.loadLibrary("q8demo");
-    }
+//    static {
+//        System.loadLibrary("q8demo");
+//    }
 
     private ActivityMainBinding binding;
 
