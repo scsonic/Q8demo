@@ -1,0 +1,3 @@
+[submodule "android+unity"]
+	path = android+unity
+	url = https://github.com/WeroldFrannie/hdb_android.git
