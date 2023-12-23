@@ -1,3 +1,6 @@
 [submodule "android+unity"]
 	path = android+unity
 	url = https://github.com/WeroldFrannie/hdb_android.git
+[submodule "unity"]
+	path = unity
+	url = https://github.com/WeroldFrannie/hdb_unity.git
